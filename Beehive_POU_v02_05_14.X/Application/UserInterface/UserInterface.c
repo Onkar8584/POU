@@ -1312,105 +1312,8 @@ bool UserInterface(void)
   }
   else {
     // Nothing To Do
+            
       
-//       if ( faultIndication.errorExists(SCALE_DETECTION_ERROR) == false) 
-       {
-      
-        if((flag_Bank1Disable)  ||
-           (flag_Bank2Disable))
-            {
-                if((faultIndication.faultCount == 1) && (faultIndication.faultsListARY[uI.faultIndex] == OVER_HEAT_ERROR) && \
-                    (flowDetector.flags.flowDetectedFLG == false))
-                {
-                    if ( uI.displayState == DISPLAY_STATUS_OFF) {
-                        uI.flags.errorDisplayFLG = 0;
-                    }
-                    else if(uI.displayONTimerW != 0) {
-                        uI.DigitConvert(uI.targetTemperature);
-                        uI.displayONTimerW--;
-                    }
-                    else {
-                        uI.displayState = DISPLAY_STATUS_OFF;
-                        uI.displayONTimerW = DISPLAY_ON_TIME;
-                        uI.flags.displayEnFLG = 0;
-                        CelsiusLEDDigOut_OFF();
-                        FahrenheitLEDDigOut_OFF();
-                    }
-                }
-                else {
-                    uI.displayONTimerW = DISPLAY_ON_TIME;
-
-                    // If Display is OFF and Error Occurs will turn ON Display for no time limit to show error
-                    if ( uI.displayState == DISPLAY_STATUS_OFF) {
-                        uI.flags.displayEnFLG = 1;
-                        uI.flags.errorDisplayFLG = 0;
-                        uI.displayState = DISPLAY_STATUS_NORMAL;
-        //                uI.displayONTimerW = DISPLAY_ON_TIME;
-                    }
-                }
-                // Down count the timer
-                if ( uI.faultIndicationTimerW) {
-                  uI.faultIndicationTimerW--;
-                }
-                else {
-                    // Reload the timer
-                    uI.faultIndicationTimerW = FAULT_INDICATION_TIME;
-
-                    // Toggle the flag status
-                    uI.flags.errorDisplayFLG ^= 1;
-
-                    //     Dont display error if single fault of over heat error occurs in flow condition off
-                  if((faultIndication.faultCount == 1) && (faultIndication.faultsListARY[uI.faultIndex] == OVER_HEAT_ERROR) && \
-                          (flowDetector.flags.flowDetectedFLG == false))  
-                  {
-                      uI.DigitConvert(uI.targetTemperature);
-                  }
-                  else 
-                  {
-                    if((faultIndication.faultsListARY[uI.faultIndex] == OVER_HEAT_ERROR) && \
-                        (flowDetector.flags.flowDetectedFLG == false))  
-                    {
-                        uI.faultIndex++;
-                    }
-                    if ( uI.flags.errorDisplayFLG == 1) 
-                    {
-                        // Display the string "Err"
-                        uI.RawData(SEVEN_SEG_CODE_FOR_E, SEVEN_SEG_CODE_FOR_r, SEVEN_SEG_CODE_FOR_r);
-                    }
-                    else 
-                    {
-                        // Convert the error code into seven segment data
-                        Errors_ETYP errorID = faultIndication.faultsListARY[uI.faultIndex];
-//                        if(flag_Bank1Disable)
-//                            uI.ErrorConvert(errorCodesDisplayARY[31]);
-//                        if(flag_Bank2Disable)
-//                        else
-//                            uI.ErrorConvert(errorCodesDisplayARY[32]);
-                    }
-
-                    if ( uI.flags.errorDisplayFLG == 1) {
-                      // Display the string "Err"
-                      uI.RawData(SEVEN_SEG_CODE_FOR_E, SEVEN_SEG_CODE_FOR_r, SEVEN_SEG_CODE_FOR_r);
-                    }
-                    else {
-                    // Convert the error code into seven segment data
-                    Errors_ETYP errorID = faultIndication.faultsListARY[uI.faultIndex];
-//                         if(flag_Bank1Disable)
-//                            uI.ErrorConvert(errorCodesDisplayARY[31]);
-//                        if(flag_Bank2Disable)
-//                         else
-//                            uI.ErrorConvert(errorCodesDisplayARY[32]);
-
-                        uI.faultIndex++;
-                        if ( uI.faultIndex >= faultIndication.faultCount) {
-                          uI.faultIndex = 0;
-                        }
-                    }
-                  }
-                }
-            }
-        
-       }
   }
 
   uI.Displaycontrol();
@@ -1439,8 +1342,6 @@ void display_error(uint16_t fault_code)
             
         case 2:
             // Convert the error code into seven segment data
-//            Errors_ETYP errorID = faultIndication.faultsListARY[uI.faultIndex];
-//            uI.ErrorConvert(errorCodesDisplayARY[errorID]);
             uI.ErrorConvert(fault_code);
             flag_err_disp = 3;
             break;

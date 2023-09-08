@@ -24,7 +24,7 @@ Method Calling Requirements:
 
 Resources:
   2 GPIOs for control the 2 opto couplers
-  2 GPIOs for its feedback
+
 
 IoTranslate requirements:
   The following #defines to be ON and OFF the Opto couplers
@@ -32,9 +32,7 @@ IoTranslate requirements:
     #define OptoCoupler1ControlDigOut_OFF()
     #define OptoCoupler2ControlDigOut_ON()
     #define OptoCoupler2ControlDigOut_OFF()
-    #define OptoCoupler1FBStatusDigIn_Read()
-    #define OptoCoupler2FBStatusDigIn_Read()
-
+ 
 ================================================================================
  History:	
 -*-----*-----------*------------------------------------*-----------------------
@@ -95,7 +93,6 @@ Resources:
        09-24-2019  Initial Write                        Poorana kumar G
 --------------------------------------------------------------------------------
 */
-
 bool OptoCouplerModulate(void)
 {
   uint8_t Power = 0;
@@ -104,139 +101,6 @@ bool OptoCouplerModulate(void)
   if ( optoCouplerControl.flags.msAfterLCFLG) {
     // Clear the flag
     optoCouplerControl.flags.msAfterLCFLG = 0;
-
-    // Here we cannot read the opto control pin and process against the feed
-    // back status. If the control pin is shorted with ground, the control pin
-    // will be read as 0 and feed back will be 1 so it will cause the
-    // erroneous behavior board assumes that it as a valid one
-    // If both the Control and feedback pins are in same level, report error
-    if((tempControl.relayStatus != RELAY_CONTROL_LOWFLOW) &&    \
-            (tempControl.relayStatus != RELAY_CONTROL_SHUTDOWN)){
-			/**********************************************************************************
-			*	Code section commented below corresponds to instaneous read of 
-			*	Optocoupler_1 Feedback status Digital Input
-			*/        
-//        if ( optoCouplerControl.flags.optoCouplerStatusFLG ==       \
-//                            OptoCoupler1FBStatusDigIn_Read()) 
-////        {
-////            faultIndication.Error(IO_TEST_ERROR);
-////        }
-            /********************************************************************************/
-        
-			/**********************************************************************************
-			*	Code section below corresponds to debounce iterations added for IO_TEST_ERROR
-			*	Flag_Error = Optocoupler_1 Feedback status Digital Input
-				flag_1msTimer = 100ms timer for Flag_Error 
-				DebounceIterations = Number of debounce iteration i.e. 5.
-				
-			*/        
-            if(Flag_Error == 1)  
-            {                
-                Flag_Error = OptoCoupler1FBStatusDigIn_Read();
-            }   
-        
-            if(Flag_Error == 0)  
-            {                
-                if(flag_once == 0)
-                {
-                        flag_once = 1;
-                        Timer_1ms = 0;
-                }
-              
-                if(flag_1msTimer == 1)
-                {                    
-                    flag_once = 0;
-                    
-                    Timer_1ms = 0;
-                    
-                    flag_1msTimer = 0;
-                    Flag_Error = OptoCoupler1FBStatusDigIn_Read();
-                    
-                     if(Flag_Error == 0)  
-                        debounce_call++;
-                     else
-                     {
-                         faultIndication.Clear(IO_TEST_ERROR);
-                         debounce_call = 0;    
-                         Flag_Error = 1;
-                     }
-                }
-                if(debounce_call > DebounceIterations)
-                {
-                    debounce_call = 0;          
-                    Flag_Error = 1;
-                    flag_once = 0;
-                    faultIndication.Error(IO_TEST_ERROR);
-                }
-              
-            }
-//        
-            /******************************************************************************/
-			
-			
- 			/**********************************************************************************
-			*	Code section commented below corresponds to instaneous read of 
-			*	Optocoupler_2 Feedback status Digital Input
-			*/
-        
-        // If both the Control and feedback pins are in same level, report error
-//        if ( optoCouplerControl.flags.optoCouplerStatusFLG ==       \
-//                OptoCoupler2FBStatusDigIn_Read()) {
-//            faultIndication.Error(IO_TEST_ERROR);
-//        }
-			/***********************************************************************************/
-			
-			/**********************************************************************************
-			*	Code section below corresponds to debounce iterations added for IO_TEST_ERROR
-			*	Flag_Error2 = Optocoupler_2 Feedback status Digital Input
-				flag_1msTimer2 = 100ms timer for Flag_Error2 
-				DebounceIterations = Number of debounce iteration i.e. 5.
-				
-			*/			                        
-            if(Flag_Error2 == 1)  
-            {             
-                Flag_Error2 = OptoCoupler2FBStatusDigIn_Read();
-            }
-        
-            if(Flag_Error2 == 0)  
-            {                
-                if(flag_once2 == 0)
-                {
-                        flag_once2 = 1;
-                        Timer_1ms2 = 0;
-                }
-              
-                if(flag_1msTimer2 == 1)
-                {
-//                    flag_once2 = 0;
-                    flag_1msTimer2 = 0;
-                    
-                    Timer_1ms2 = 0;
-                    
-                    
-                    Flag_Error2 = OptoCoupler2FBStatusDigIn_Read();
-                    
-                     if(Flag_Error2 == 0)  
-                        debounce_call2++;
-                     else
-                     {
-                         faultIndication.Clear(IO_TEST_ERROR);
-                         debounce_call2 = 0;        
-                         Flag_Error2 = 1;
-                         flag_once2 = 0;
-                     }
-                }
-                if(debounce_call2 > DebounceIterations)
-                {
-                    debounce_call2 = 0;          
-                    Flag_Error2 = 1;
-                    flag_once2 = 0;
-                   faultIndication.Error(IO_TEST_ERROR);
-                }
-              
-            }        
-
-    }
 
     // Check the conditions to control the opto coupler
     if ( (faultIndication.faultCount == NO_FAULTS) &&               \
@@ -319,7 +183,6 @@ bool OptoCouplerModulate(void)
     }
   }
 
-  
   return TASK_COMPLETED;
 }
 

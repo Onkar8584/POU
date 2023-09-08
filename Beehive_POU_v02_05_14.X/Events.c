@@ -31,6 +31,10 @@ IoTranslate requirements:
 1.1.0  02-10-2020  As per the Beta requirement changes      Poorana kumar G
                    updated the functions. Buzzer control
                    timer callback removed.
+2.5.14 04-28-2023  As per discussion AC Line frequency      Onkar Raut
+ *                 error delayed by 10 Sec using 
+ *                 Max_CountACError
+2.5.15 06-07-2023  In TimerISR Avg.Diff.Temperature 
 --------------------------------------------------------------------------------
 */
 
@@ -40,12 +44,24 @@ IoTranslate requirements:
 
 #define Max_CountACError 12
 
+#define DIFFERENTIALCOUNTER 30
+#define AVGDIFFTEMPTHRESHOLD 10.0
+
 extern uint16_t debug_PowerADCLocalW ;
 
 static volatile uint16_t timerISRCounts = 0;
 
 uint8_t flag_AcLineError = 0,counter_AcLineError=0;
 
+extern uint16_t DifferentialChamberTemp;
+
+uint8_t DiffTempCounter = 0,flag_AvgDiffTempError = 0;
+
+uint16_t DiffTempAccum = 0;
+float AvgDiffChamberTemp = 0;
+
+float Copy_AvgDiffChamberTemp;
+uint16_t Copy_DiffTempAccum = 0;
 /*
 ================================================================================
 Method name:  TimerISRFunction
@@ -62,7 +78,11 @@ Resources:
 ================================================================================
  History:	
 -*-----*-----------*------------------------------------*-----------------------
-       09-30-2019  Initial Write                        Poorana kumar G
+       09-30-2019  Initial Write                                 Poorana kumar G
+ *     06-07-2023  Average Differential Temperature calculated   Onkar G. Raut.
+ *                 Event flag set for Avg. Diff. Temperature
+ *                 is greater than 10 between thermistor 1 & 2
+ *                 
 --------------------------------------------------------------------------------
 */
 
@@ -97,8 +117,6 @@ if ( ++optoCouplerControl.lcCheckTimer >= ONE_SEC_IN_MS ) {
     // Check the AC line frequency is within range
   if ( (optoCouplerControl.lcCount < MIN_AC_LINE_TOGGLES_COUNT) || \
             (optoCouplerControl.lcCount > MAX_AC_LINE_TOGGLES_COUNT)) {
-//  if(debug_PowerADCLocalW > 2000)
-//            faultIndication.Error(AC_LINE_FREQUENCY_ERROR);
             counter_AcLineError++;
             if(counter_AcLineError > Max_CountACError)
                     flag_AcLineError = 1;
@@ -112,6 +130,44 @@ if ( ++optoCouplerControl.lcCheckTimer >= ONE_SEC_IN_MS ) {
   {
       faultIndication.Error(AC_LINE_FREQUENCY_ERROR);
   }
+  
+  /********************************************************************************************
+   *    Two Chamber Algorithm Block
+   */
+   if(flowDetector.flags.flowDetectedFLG == true)   //Flow Detected
+   {
+        DifferentialChamberTemp = adcCountToTemperature(adcRead.adcDataARYW[CHAMBER_TEMPERATURE1]) - 
+                                  adcCountToTemperature(adcRead.adcDataARYW[CHAMBER_TEMPERATURE2]);
+
+        DifferentialChamberTemp = abs(DifferentialChamberTemp); //Absolute value of differential temperature
+
+        DiffTempAccum += DifferentialChamberTemp;//Accumlated value for Differential temperature
+        Copy_DiffTempAccum = DiffTempAccum;
+        DiffTempCounter++;
+
+        if(DiffTempCounter >= DIFFERENTIALCOUNTER)           // If samples are more than 30
+        {
+            DiffTempCounter = 0;
+            AvgDiffChamberTemp = DiffTempAccum / DIFFERENTIALCOUNTER;    //Calculate average differential temperature
+    //        Copy_DiffTempAccum = DiffTempAccum;
+            DiffTempAccum = 0;                          //
+
+            if(AvgDiffChamberTemp >= AVGDIFFTEMPTHRESHOLD)  //If avg. diff. temperature is greater than 10
+                flag_AvgDiffTempError = 1;  //Set Flag Handled in TemperatureControl.c
+
+            Copy_AvgDiffChamberTemp = AvgDiffChamberTemp;
+            AvgDiffChamberTemp = 0;         
+        }
+   }
+   else
+   {
+       DifferentialChamberTemp = 0;
+       AvgDiffChamberTemp = 0;
+        flag_AvgDiffTempError = 0;
+        DiffTempCounter = 0;
+        DiffTempAccum = 0;  
+   }
+   /*****************************************************************************/
     // Reset the timer
     optoCouplerControl.lcCheckTimer = 0;
     // Reset the AC line cross count

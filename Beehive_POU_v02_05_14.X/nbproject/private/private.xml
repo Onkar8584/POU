@@ -3,9 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/Project_Src_Code/AOSmith/POU/Latest_Firmware_Releases/28_04_2023/Beehive_POU_v02_05_14.X/Version.h</file>
-            <file>file:/D:/Project_Src_Code/AOSmith/POU/Latest_Firmware_Releases/28_04_2023/Beehive_POU_v02_05_14.X/Application/OptoCouplerControl/OptoCouplerControl.c</file>
-            <file>file:/D:/Project_Src_Code/AOSmith/POU/Latest_Firmware_Releases/28_04_2023/Beehive_POU_v02_05_14.X/Application/SelfTest/SelfTest.c</file>
+            <file>file:/D:/AzureWorkspace/POU/Beehive_POU_v02_05_19.X/Application/FaultIndication/FaultIndication.h</file>
+            <file>file:/D:/AzureWorkspace/POU/Beehive_POU_v02_05_19.X/Application/FaultIndication/FaultIndication.c</file>
+            <file>file:/D:/AzureWorkspace/POU/Beehive_POU_v02_05_19.X/Application/TemperatureControl/TemperatureControl.c</file>
         </group>
     </open-files>
 </project-private>

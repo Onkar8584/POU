@@ -83,7 +83,6 @@ typedef struct{
   uint16_t flashCRCTestTimerW;
   uint16_t eepromCRCTestTimerW;
   uint16_t clcokTestTimerW;
-  uint16_t ioTestTimerW;
 }  SelfTest_STYP;
 
 // DEFINE CLASS OBJECT DEFAULTS
@@ -98,7 +97,6 @@ typedef struct{
                                 FLASH_TEST_INTERVAL,        \
                                 EEPROM_TEST_INTERVAL,       \
                                 CLOCK_TEST_INTERVAL,        \
-                                IO_TEST_INTERVAL,           \
                             }
 
 #define CPU_REGISTER_TEST_INTERVAL      120  // * 500ms = 60 seconds
@@ -107,7 +105,6 @@ typedef struct{
 #define FLASH_TEST_INTERVAL             1    // * 500ms = 0.5 seconds
 #define EEPROM_TEST_INTERVAL            120  // * 500ms = 60 seconds
 #define CLOCK_TEST_INTERVAL             7200 // * 500ms = 3600 seconds
-#define IO_TEST_INTERVAL                2    // * 500ms = 1 seconds
 
 #define RAM_RUN_TIME_TEST_SIZE          4    // No of bytes to be tested
 #define CODE_RUN_TIME_TEST_SIZE         16   // No of bytes to be tested

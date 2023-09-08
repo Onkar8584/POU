@@ -31,7 +31,7 @@ Resources:
 // Parts of the version
 #define MAJOR               2
 #define MINOR               5
-#define INCREMENTAL         14//13//11//10//8//7//3   //2
+#define INCREMENTAL         19//18//17//16//15//14//13//11//10//8//7//3   //2
 #define INTERNAL            4   //0
 
 // To convert the parameter into string

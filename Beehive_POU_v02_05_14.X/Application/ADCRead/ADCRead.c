@@ -255,10 +255,10 @@ static void checkVccError(void)
 
       if ( PowerADCLocalW < POWER_SUPPLY_MIN_VOLTAGE) {
         // Declare power supply error
-        faultIndication.Error(DC_SUPPLY_ERROR);
+        faultIndication.Error(DC_SUPPLY_ERROR);             //Set Error DC Supply
       }
       else {
-        faultIndication.Clear(DC_SUPPLY_ERROR);
+        faultIndication.Clear(DC_SUPPLY_ERROR);             //Clear Error DC Supply
       }
     }
   }

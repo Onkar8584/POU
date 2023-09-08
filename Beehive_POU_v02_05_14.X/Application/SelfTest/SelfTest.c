@@ -33,13 +33,6 @@ Resources:
   This object will access the class B library provided by microchip.
   And for IO test it access 6 feedback GPIOs
 
-IoTranslate requirements:
-  #define Relay1SupplyStatusDigIn_Read()// Relay 1 - 5V feedback GPIO read
-  #define Relay1GroundStatusDigIn_Read()// Relay 1 - Gnd feedback GPIO read
-  #define Relay2SupplyStatusDigIn_Read()// Relay 2 - 5V feedback GPIO read
-  #define Relay2GroundStatusDigIn_Read()// Relay 2 - Gnd feedback GPIO read
-  #define OptoCoupler1StatusDigIn_Read()// Opto Coupler 1 Status input GPIO read
-  #define OptoCoupler2StatusDigIn_Read()// Opto Coupler 2 Status input GPIO read
   // Enable the clock input to timer and start it
   #define ENABLE_TIMER_FOR_CLOCK_TEST()
   // Disable the clock input to timer and stop it
@@ -61,16 +54,6 @@ IoTranslate requirements:
 
 #include "SelfTest.h"
 
-#define DebounceIterations 5
-
-uint8_t Flag_IO_TestFault1 = 0, Flag_IO_TestFault2 = 0, Flag_IO_TestFault3 = 0, Flag_IO_TestFault4 = 0, Flag_IO_TestFault5 = 0;
-
-uint8_t flag_once3 = 0, debounce_call3 = 0;
-
-extern uint16_t Timer_1ms3;
-extern uint8_t flag_1msTimer3;
-
-extern uint16_t LavModeTempMax ;
 
 /*
 ================================================================================
@@ -337,138 +320,6 @@ bool ClassB_RunTimeTest(void)
       DISABLE_TIMER_AFTER_CLOCK_TEST();
     }
   }
-
-  // Monitors the GPIO feedback
-  if ( --selfTest.ioTestTimerW == 0) {
-    selfTest.ioTestTimerW = IO_TEST_INTERVAL;
-    
-	/************************************************************************************************************************************************
-	*	Code section below corresponds to debounce iterations added for IO_TEST_ERROR
-	*	Flag_IO_TestFault1, Flag_IO_TestFault2, Flag_IO_TestFault3, Flag_IO_TestFault4, Flag_IO_TestFault5 
-	*   = Relay feedback status for various combination of instaneous relay status read
-		flag_1msTimer3 = 100ms timer for Flag_IO_TestFault1 to Flag_IO_TestFault5
-		DebounceIterations = Number of debounce iteration i.e. 5.				
-	*/
-    if((Flag_IO_TestFault1 == 1) || (Flag_IO_TestFault2 == 1) ||
-        (Flag_IO_TestFault3 == 1) || (Flag_IO_TestFault4 == 1) || (Flag_IO_TestFault5 == 1))
-    {
-                if(flag_once3 == 0)
-                {
-                        flag_once3 = 1;
-                        Timer_1ms3 = 0;
-                }
-                if(flag_1msTimer3 == 1)
-                {                    
-                    flag_once3 = 0;
-                    
-                    Timer_1ms3 = 0;
-                    
-                    flag_1msTimer3 = 0;
-                    
-                    Flag_IO_TestFault1 = 0;Flag_IO_TestFault2 = 0;Flag_IO_TestFault3 = 0;Flag_IO_TestFault4 = 0;Flag_IO_TestFault5 = 0;
-                    
-                    debounce_call3++;
-                    
-                     if(debounce_call3 > DebounceIterations)
-                     {
-                            debounce_call3 = 0;          
-//                            Flag_Error = 1;
-                            flag_once3 = 0;
-                            faultIndication.Error(IO_TEST_ERROR);
-                    }
-                }
-    }
-    else
-    {
-                        faultIndication.Clear(IO_TEST_ERROR);
-                         debounce_call3 = 0;    
-                          flag_once3 = 0;
-    }
-    /*******************************************************************************************************************************************/
-  
-    if ( (tempControl.relayStatus == RELAY_CONTROL_CONTROL)             \
-            /*|| (tempControl.relayStatus == RELAY_CONTROL_SHUTDOWN)*/      \
-            || (tempControl.relayStatus == RELAY_CONTROL_STBYHEAT)      \
-            || (tempControl.relayStatus == RELAY_CONTROL_DRY_FIRE_WAIT)) {
-
-      if ( (!Relay1SupplyStatusDigIn_Read())                            \
-              || (!Relay2SupplyStatusDigIn_Read())                      \
-              || ( Relay1GroundStatusDigIn_Read())                      \
-              || ( Relay2GroundStatusDigIn_Read())) {
-//        faultIndication.Error(IO_TEST_ERROR);
-          Flag_IO_TestFault1 = 1;
-      }
-    }
-    else if (tempControl.relayStatus == RELAY_CONTROL_LOWFLOW){
-        if ( ((!Relay1SupplyStatusDigIn_Read())                          \
-              && (!Relay2SupplyStatusDigIn_Read()))                      \
-              || (( Relay1GroundStatusDigIn_Read())                      \
-              && ( Relay2GroundStatusDigIn_Read()))) {
-//        faultIndication.Error(IO_TEST_ERROR);
-            Flag_IO_TestFault2 = 1;
-      }
-    }
-    else if (tempControl.relayStatus == RELAY_CONTROL_SHUTDOWN) {
-        if(tempControl.prevRelayStatus == RELAY_CONTROL_LOWFLOW) {
-            if ( ((!Relay1SupplyStatusDigIn_Read())                          \
-                    && (!Relay2SupplyStatusDigIn_Read()))                      \
-                    || (( Relay1GroundStatusDigIn_Read())                      \
-                    && ( Relay2GroundStatusDigIn_Read()))) {
-//              faultIndication.Error(IO_TEST_ERROR);
-                Flag_IO_TestFault3 = 1;
-            }
-        }
-        else {
-            if ( (!Relay1SupplyStatusDigIn_Read())                            \
-                    || (!Relay2SupplyStatusDigIn_Read())                      \
-                    || ( Relay1GroundStatusDigIn_Read())                      \
-                    || ( Relay2GroundStatusDigIn_Read())) {
-//              faultIndication.Error(IO_TEST_ERROR);
-                 Flag_IO_TestFault4 = 1;
-            }
-        }
-    }
-    else /*if (tempControl.relayStatus != RELAY_CONTROL_SHUTDOWN)*/ {
-      if ( ( Relay1SupplyStatusDigIn_Read())                            \
-              || ( Relay2SupplyStatusDigIn_Read())                      \
-              || (!Relay1GroundStatusDigIn_Read())                      \
-              || (!Relay2GroundStatusDigIn_Read())) {
-//        faultIndication.Error(IO_TEST_ERROR);
-          Flag_IO_TestFault5 = 1;
-      }
-      else if(faultIndication.errorExists(IO_TEST_ERROR) == true) {
-        if ( optoCouplerControl.flags.optoCouplerStatusFLG ==       \
-                OptoCoupler1FBStatusDigIn_Read()) {
-                //do not clear error
-        }
-
-        // If both the Control and feedback pins are in same level, report error
-        else if ( optoCouplerControl.flags.optoCouplerStatusFLG ==       \
-                OptoCoupler2FBStatusDigIn_Read()) {
-                //do not clear error
-        }
-        else{   //if fault is recovered
-            faultIndication.Clear(IO_TEST_ERROR);
-        }
-    }
-    }
-//    if(faultIndication.errorExists(IO_TEST_ERROR) == true) {
-//        if ( optoCouplerControl.flags.optoCouplerStatusFLG ==       \
-//                OptoCoupler1FBStatusDigIn_Read()) {
-//                //do not clear error
-//        }
-//
-//        // If both the Control and feedback pins are in same level, report error
-//        else if ( optoCouplerControl.flags.optoCouplerStatusFLG ==       \
-//                OptoCoupler2FBStatusDigIn_Read()) {
-//                //do not clear error
-//        }
-//        else{   //if fault is recovered
-//            faultIndication.Clear(IO_TEST_ERROR);
-//        }
-//    }
-  }
-  
   return TASK_COMPLETED;
 }
 

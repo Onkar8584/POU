@@ -116,7 +116,7 @@ bool FlowDetector(void)
         flowDetector.flags.flowDetectedFLG = false;
       }
     }
-
+ 
     // Convert the flow toggles per second to get frequency
     update_flowIn_Gallons(flowDetectorTogglesW);
     
@@ -154,16 +154,14 @@ float Get_flowIn_Gallons(void){
 }
 
 int check_Flow_Threshold(void){
-    if((flowDetector.flags.flowDetectedFLG == true) &&      \
-        (adcRead.flags.validThermistorsFLG == true)){
+    if(flowDetector.flags.flowDetectedFLG == true) 
+    {
         
-        if (flowDetector.flowInGallons  < flowDetector.flowLowerBoundryW){
-      //      faultIndication.Error(FLOW_SENSOR_ERROR);
+        if (flowDetector.flowInGallons  < flowDetector.flowLowerBoundryW){     
             prevResult = FLOW_SENSOR_ERROR;
             return FLOW_SENSOR_ERROR;
           }
         else if (flowDetector.flowInGallons  >= (flowDetector.flowLowerBoundryW + flowDetector.flowHysteresisOffsetW)) {
-      //      faultIndication.Clear(FLOW_SENSOR_ERROR);
             prevResult = NO_ERROR;
             return NO_ERROR;
           }

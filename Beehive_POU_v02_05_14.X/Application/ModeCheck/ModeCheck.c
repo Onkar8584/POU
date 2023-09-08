@@ -182,17 +182,7 @@ bool ModeCheckFunction(void)
           modeCheck.temperatureMax = userTemperatureMaxARYW[curModeDecided];
           nonVol.settings.targetTemperature = UserDefaultARYW[curModeDecided];
         }
-        
-//         if (curModeDecided == LAVATORY_MODE) {
-             
-//             Flag_Lavatory_mode = 1;
-//             LavModeTempMax = userTemperatureMaxARYW[curModeDecided];
-//         }
-//         else
-//         {
-//             Flag_Lavatory_mode = 0;
-//         }
-        
+              
         uI.targetTemperature = nonVol.settings.targetTemperature;
 
         uI.DigitConvert(uI.targetTemperature);
