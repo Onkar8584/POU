@@ -54,10 +54,6 @@ const uint16_t userTemperatureMinARYW[4] = {85, 80, 140, 0};
 const uint16_t userTemperatureMaxARYW[4] = {85, 150, 180, 0};       //sanitory mode temp reverted from 200 to 180 degree as per comments from mike
 const uint16_t UserDefaultARYW[4] = {85, 105, 140, 0};
 
-uint16_t LavModeTempMax = 0;
-uint8_t Flag_Lavatory_mode = 0;
-
-TemperatureMode_ETYP curModeDecided;
 /*
 ================================================================================
 Method name:  ModeCheckFunction
@@ -96,7 +92,7 @@ bool ModeCheckFunction(void)
   // Must be initialized with the time to report if the error detected at power up
   static uint8_t modeTimer = MODE_CONFIRM_TIME+1;
   TemperatureMode_ETYP curModeFromIO;
-//  TemperatureMode_ETYP curModeDecided;
+  TemperatureMode_ETYP curModeDecided;
 
   // Check Emergency Eye wash mode GPIO
   if ( EmergencyEyeWashModeDigIn_Read() == false) {
@@ -182,7 +178,6 @@ bool ModeCheckFunction(void)
           modeCheck.temperatureMax = userTemperatureMaxARYW[curModeDecided];
           nonVol.settings.targetTemperature = UserDefaultARYW[curModeDecided];
         }
-              
         uI.targetTemperature = nonVol.settings.targetTemperature;
 
         uI.DigitConvert(uI.targetTemperature);

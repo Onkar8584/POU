@@ -126,17 +126,8 @@ static const uint16_t errorCodesDisplayARY[] =
   ERROR_CODE_IO_TEST,
   ERROR_CODE_EEPROM_CRC_TEST,
   ERROR_CODE_BUTTON_MALFUNCTION,
-  ERROR_CODE_TEMPERATURE_MODE,
-//  ERROR_CODE_SCALE_BANK1,
-//  ERROR_CODE_SCALE_BANK2,
-  ERROR_CODE_SCALE_DETECTION
+  ERROR_CODE_TEMPERATURE_MODE
 };
-
-char flag_err_disp = 0;
-
-void display_error(uint16_t fault_code);
-
-extern uint8_t flag_Bank1Disable,flag_Bank2Disable;
 
 /*
 ================================================================================
@@ -1262,12 +1253,10 @@ bool UserInterface(void)
             Errors_ETYP errorID = faultIndication.faultsListARY[uI.faultIndex];
             uI.ErrorConvert(errorCodesDisplayARY[errorID]);
 
-//             if ( faultIndication.errorExists(SCALE_DETECTION_ERROR) == false) {
                 uI.faultIndex++;
                 if ( uI.faultIndex >= faultIndication.faultCount) {
                   uI.faultIndex = 0;
                 }
-//             }
             }
           }
         }
@@ -1312,8 +1301,6 @@ bool UserInterface(void)
   }
   else {
     // Nothing To Do
-            
-      
   }
 
   uI.Displaycontrol();
@@ -1321,35 +1308,3 @@ bool UserInterface(void)
   return TASK_COMPLETED;
 }
 
-void display_error(uint16_t fault_code)
-{
-               uI.faultIndicationTimerW = FAULT_INDICATION_TIME;
-    switch(flag_err_disp)
-    {
-        
-    
-        case 0:
-              // Display the string "Err"
-              uI.RawData(SEVEN_SEG_CODE_FOR_E, SEVEN_SEG_CODE_FOR_r, SEVEN_SEG_CODE_FOR_r);
-              flag_err_disp = 1;
-              break;
-            
-        case 1:
-            
-                flag_err_disp = 2;
-            break;
-            
-            
-        case 2:
-            // Convert the error code into seven segment data
-            uI.ErrorConvert(fault_code);
-            flag_err_disp = 3;
-            break;
-            
-        case 3:
-                    
-                flag_err_disp = 0;
-            break;            
-           
-    }
-}

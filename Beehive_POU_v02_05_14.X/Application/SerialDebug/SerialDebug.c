@@ -72,17 +72,6 @@ static const char *modeStringsARY[] =
   "UNKNO"
 };
 
-static const char *errorStringsARY1[] =
-
-{
-  "E11"     // Anti Scale detection
-    
-};
-
-static const char *errorStringsARY2[] =
-{
-    "E12"     // Anti Scale detection       
-};
 // Debug strings for errors
 static const char *errorStringsARY[] =
 {
@@ -115,48 +104,10 @@ static const char *errorStringsARY[] =
   "T",      // Heater feedback test
   "U",      // EEPROM Flash CRC test
   "B",      // Button Malfunction
-  "J",      // Temperature Mode Jumper
-//  "E12"     // Anti Scale detection
-//  "E11"     // Anti Scale detection          
-  "E07"     // Anti Scale detection                   
+  "J"       // Temperature Mode Jumper
 };
 
-int cntr_serial_debug = 0;
 
-extern unsigned char single_chamber;
-
-extern uint16_t LavModeTempMax ;
-extern uint16_t debug_PowerADCLocalW ;
-
-extern uint16_t PowerADCLocalW ;
-
-extern uint8_t ScaleEventCount ;
-
-extern uint8_t flag_thermistor_cntchange;
-
-extern uint8_t flag_Bank1Disable,flag_Bank2Disable;
-
-extern uint8_t ScaleEventCount1;
-extern uint8_t ScaleEventCount2;
-extern uint8_t ScaleEventCount3;
-extern uint8_t ScaleEventCount4;
-extern uint16_t DifferentialChamberTemp;
-
-extern uint8_t Flag_ErrorScaleBank1,Flag_ErrorScaleBank2;
-
-extern uint8_t counter_ErrorDetect;
-
-extern  bool LineStatusFlg;
-
-extern uint8_t flag_AcLineError,counter_AcLineError;
-
-static int8_t PrintInteger(int16_t number, int8_t digits, int8_t forceNeg);
-
-extern float Copy_AvgDiffChamberTemp;
-
-extern uint16_t Copy_DiffTempAccum;
-
-extern uint8_t ChamberQuantityDetect;
 /*
 ================================================================================
 Method name:  PrintSting
@@ -361,8 +312,6 @@ bool SerialDebugProcess(void)
   // Increment the timestamp
   Serial.debugTimeStampW++;
 
-  cntr_serial_debug = Serial.debugTimeStampW;
-    
   switch ( Serial.debugRxStatus) {
     case DEBUG_SERIAL_STATE_IDLE:
       digitCount = UART1_ReadBuffer(Serial.debugRxARY, 0xFF);
@@ -455,31 +404,17 @@ bool SerialDebugProcess(void)
 
         // Faults list print
         if (faultIndication.faultCount == NO_FAULTS) {
-           
-            if(flag_Bank1Disable == 1)
-            {
-                 digitCount = PrintSting(errorStringsARY1[0], 0);
-            }
-            else if(flag_Bank2Disable == 1)
-            {
-                digitCount = PrintSting(errorStringsARY2[0], 0);
-            }
-            else if((!flag_Bank1Disable)    &&
-                    (!flag_Bank2Disable))                                   
-                digitCount = PrintSting(errorStringsARY[0], 0);
+          digitCount = PrintSting(errorStringsARY[0], 0);
         }
         else {
-                  tempW = 0;
-                  digitCount = 0;
-//                  if ( faultIndication.errorExists(SCALE_DETECTION_ERROR) == false) 
-                  {
-                      while ( tempW < faultIndication.faultCount) {
-                        digitCount = PrintSting(errorStringsARY[faultIndication.faultsListARY[tempW]], digitCount);
-                        digitCount = PrintSting(" ", digitCount);
+          tempW = 0;
+          digitCount = 0;
+          while ( tempW < faultIndication.faultCount) {
+            digitCount = PrintSting(errorStringsARY[faultIndication.faultsListARY[tempW]], digitCount);
+            digitCount = PrintSting(" ", digitCount);
 
-                        tempW++;
-                  }
-                  }
+            tempW++;
+          }
         }
         digitCount = PrintSting(",\t", digitCount);
         (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
@@ -580,65 +515,8 @@ bool SerialDebugProcess(void)
         (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
 
         digitCount = PrintSting(modeStringsARY[nonVol.settings.temperatureMode], 0);
-        digitCount = PrintSting(",\t", digitCount);    //digitCount = PrintSting("\r\n", digitCount);
-        (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
-        
-//          digitCount = PrintInteger(flag_Bank1Disable, 3, 0);
-////        digitCount = PrintInteger(single_chamber, 3, 0);
-////        digitCount = PrintInteger(counter_ErrorDetect, 3, 0);
-//          digitCount = PrintSting("\r\n", digitCount);
-//         (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
-//         
-//        digitCount = PrintInteger(flag_Bank2Disable, 3, 0);
-////        digitCount = PrintInteger(counter_ErrorDetect, 3, 0);
-//        digitCount = PrintSting(",\t", digitCount);
-//        (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
-         
-        /***************************************************************************************************
-         * Antiscale error counter parameters commented in serial debug
-         */ 
-//        digitCount = PrintInteger(flag_thermistor_cntchange, 3, 0);
-        digitCount = PrintInteger(ScaleEventCount, 3, 0);
-        digitCount = PrintSting(",\t", digitCount);
-        (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
-        
-//         digitCount = PrintInteger(ScaleEventCount1, 3, 0);
-//        if(ChamberQuantityDetect == 2)
-//            digitCount = PrintInteger(ChamberQuantityDetect, 3, 0);
-//        else
-            digitCount = PrintInteger(ScaleEventCount1, 3, 0);
-        digitCount = PrintSting(",\t", digitCount);
-        (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
-        
-         digitCount = PrintInteger(ScaleEventCount2, 3, 0);
-//        digitCount = PrintInteger(counter_ErrorDetect, 3, 0);
-        digitCount = PrintSting(",\t", digitCount);
-        (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
-        
-//         digitCount = PrintInteger(ScaleEventCount3, 3, 0);
-        if(ChamberQuantityDetect == 2)
-            digitCount = PrintInteger(Copy_DiffTempAccum, 3, 0);
-        else
-            digitCount = PrintInteger(ScaleEventCount3, 3, 0);        
-//        digitCount = PrintInteger(counter_ErrorDetect, 3, 0);
-        digitCount = PrintSting(",\t", digitCount);
-        (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
-        
-//         digitCount = PrintInteger(ScaleEventCount4, 3, 0);
-        if(ChamberQuantityDetect == 2)
-            digitCount = PrintInteger(Copy_AvgDiffChamberTemp, 5, 0);
-        else
-            digitCount = PrintInteger(ScaleEventCount4, 3, 0);
         digitCount = PrintSting("\r\n", digitCount);
-        (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);            
-            // Outlet temperature conversion and print
-//        tempW = adcCountToTemperature(Tout);
-//        digitCount = PrintInteger(LavModeTempMax, 3, 0);
-        
-//        digitCount = PrintInteger(PowerADCLocalW, 5, 0);
-//        digitCount = PrintSting(",\t", digitCount);
-//        (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
-         /***************************************************************************************/
+        (void) UART1_WriteBuffer(Serial.debugTxARY, digitCount);
       }
     break;
 

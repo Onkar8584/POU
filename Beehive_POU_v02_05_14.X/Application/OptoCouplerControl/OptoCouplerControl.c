@@ -24,7 +24,7 @@ Method Calling Requirements:
 
 Resources:
   2 GPIOs for control the 2 opto couplers
-
+  2 GPIOs for its feedback
 
 IoTranslate requirements:
   The following #defines to be ON and OFF the Opto couplers
@@ -32,7 +32,8 @@ IoTranslate requirements:
     #define OptoCoupler1ControlDigOut_OFF()
     #define OptoCoupler2ControlDigOut_ON()
     #define OptoCoupler2ControlDigOut_OFF()
- 
+
+
 ================================================================================
  History:	
 -*-----*-----------*------------------------------------*-----------------------
@@ -42,8 +43,6 @@ IoTranslate requirements:
 
 
 #include "OptoCouplerControl.h"
-
-#define DebounceIterations 5
 
 // Sequence of power cycle in each mode
 const uint8_t ModulationSequence[MAX_POWER_MODE][MAX_CROSSING_CYCLES] =  
@@ -59,17 +58,7 @@ const uint8_t ModulationSequence[MAX_POWER_MODE][MAX_CROSSING_CYCLES] =
   {ON,  ON,  ON,  ON,  ON,  ON,  ON,  ON,  ON }     // Mode 8
 };
 
-extern uint16_t Timer_1ms;
-extern uint8_t flag_1msTimer;
 
-extern uint16_t Timer_1ms2;
-extern uint8_t flag_1msTimer2;
-
-uint8_t flag_once = 0, debounce_call = 0;
-uint8_t Flag_Error = 1;
-
-uint8_t flag_once2 = 0, debounce_call2 = 0;
-uint8_t Flag_Error2 = 1;
 /*
 ================================================================================
 Method name:  OptoCouplerModulate
@@ -93,6 +82,7 @@ Resources:
        09-24-2019  Initial Write                        Poorana kumar G
 --------------------------------------------------------------------------------
 */
+
 bool OptoCouplerModulate(void)
 {
   uint8_t Power = 0;
@@ -183,6 +173,7 @@ bool OptoCouplerModulate(void)
     }
   }
 
+  
   return TASK_COMPLETED;
 }
 

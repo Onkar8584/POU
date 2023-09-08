@@ -124,12 +124,8 @@ typedef struct {
 // Equivalent ADC count for 32°F or 0°C
 #define THERMISTOR_OPEN_ADC_COUNT               900
 // 10% less from (4096 * 2) = 0.5 V
-
-//#define THERMISTOR_SHORT_ADC_COUNT                8100        //8192        // ADC full count (2^12 = 4096 * 2 = 8192) = 227F
 #define THERMISTOR_SHORT_ADC_COUNT              7506        // values changed because mike Jan Updates require short count to be at 205F but actual was 200F
-//                                                            // 7372 = 200F, 7656 = 210F, 7506 = 205F, 7658 = 210
-
-
+                                                            // 7372 = 200F, 7656 = 210F, 7506 = 205F
 // (4096 - ADC count for 1.5V) * 2
 #define THERMISTOR_ANALOG_PIN_OPEN_THRESHOLD    5734
 

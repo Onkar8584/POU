@@ -53,11 +53,6 @@ IoTranslate requirements:
 
 #include "FaultIndication.h"
 
-#define DebounceCounter 10
-
-uint8_t counter_ErrorDetect=0;
-
-uint8_t Flag_ErrorScaleBank1=0, Flag_ErrorScaleBank2=0;
 
 /*
 ================================================================================
@@ -153,14 +148,6 @@ bool BuzzerLEDControl(void)
     }
   }
   
-  //   If error detected, turn ON the buzzer
-  if ( faultIndication.errorExists(SCALE_DETECTION_ERROR) == true) {
-    if ( faultIndication.flags.buzzerToggleEnableFLG == 0) {
-      BuzzerDigOut_ON();
-      faultIndication.flags.buzzerToggleEnableFLG = 1;      
-    }
-  }
-  
   return TASK_COMPLETED;
 }
 
@@ -197,7 +184,6 @@ void FaultReport(Errors_ETYP faultId)
       if(faultIndication.faultsListARY[faultIndex] == faultId) {
         return;
     }
-
     }
 
     // Reset the flag to 0 to show "Err" in display when first error is logged
@@ -205,46 +191,9 @@ void FaultReport(Errors_ETYP faultId)
     if (faultIndication.faultCount == 0) {
         uI.flags.errorDisplayFLG = 0;
     }
-    
-    counter_ErrorDetect++;
-    
-//    faultIndication.faultsListARY[faultIndication.faultCount] = faultId;
-//    faultIndication.faultCount++;
-//    faultIndication.faultsListARY[faultIndication.faultCount] = faultId;
-//    counter_ErrorDetect = faultId;    
-    
 
-    if(faultId == 26)       //10 for ch1
-    {
-        if(counter_ErrorDetect > DebounceCounter)
-        {          
-            faultIndication.faultsListARY[faultIndication.faultCount] = faultId;
-            faultIndication.faultCount++;
-        }
-    }
-            
-    else
-    {
-            faultIndication.faultsListARY[faultIndication.faultCount] = faultId;
-            faultIndication.faultCount++;
-            
-            if(faultId == 31)       //Bank1 Scale detection error
-            {
-              
-//                flag_active = 1;
-                Flag_ErrorScaleBank1 = 1;
-            }
-                
-            
-            if(faultId == 32)       //10 for ch1
-            {
-                Flag_ErrorScaleBank2 = 1;            
-//                flag_active = 1;
-            }
-    }
-//    
-
-//    faultIndication.faultCount++;
+    faultIndication.faultsListARY[faultIndication.faultCount] = faultId;
+    faultIndication.faultCount++;
 //    if ( IsCriticalError(faultId) == true) {
 //      if ( nonVol.settings.firstCriticalError == 0) {
 //        nonVol.settings.firstCriticalError = (uint8_t) faultId;
@@ -293,8 +242,6 @@ void FaultClear(Errors_ETYP faultId)
 
       if ( faultIndex < faultIndication.faultCount) {
         faultIndication.faultCount--;
-        
-        counter_ErrorDetect = 0;
 
         // Once all the errors are cleared
         if ( faultIndication.faultCount == NO_FAULTS)

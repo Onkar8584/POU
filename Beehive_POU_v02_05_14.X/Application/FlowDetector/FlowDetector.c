@@ -45,8 +45,6 @@ IoTranslate requirements:
 
 Errors_ETYP prevResult;
 
-extern uint8_t flag_scale_reset;
-
 /*
 ================================================================================
 Method name:    FlowDetector
@@ -109,13 +107,12 @@ bool FlowDetector(void)
       // Check GPIO toggles count with minimum toggles and decide flow detection
       if (flowDetectorTogglesW >= MINIMUM_TOGGLES_FOR_WATER_FLOW) {
         flowDetector.flags.flowDetectedFLG = true;
-        
-//        flag_scale_reset = 0;   //Flow detected for next Scale detect algorithm event
       }
       else {
         flowDetector.flags.flowDetectedFLG = false;
       }
     }
+
  
     // Convert the flow toggles per second to get frequency
     update_flowIn_Gallons(flowDetectorTogglesW);
@@ -154,14 +151,16 @@ float Get_flowIn_Gallons(void){
 }
 
 int check_Flow_Threshold(void){
-    if(flowDetector.flags.flowDetectedFLG == true) 
-    {
+    if((flowDetector.flags.flowDetectedFLG == true) &&      \
+        (adcRead.flags.validThermistorsFLG == true)){
         
-        if (flowDetector.flowInGallons  < flowDetector.flowLowerBoundryW){     
+        if (flowDetector.flowInGallons  < flowDetector.flowLowerBoundryW){
+      //      faultIndication.Error(FLOW_SENSOR_ERROR);
             prevResult = FLOW_SENSOR_ERROR;
             return FLOW_SENSOR_ERROR;
           }
         else if (flowDetector.flowInGallons  >= (flowDetector.flowLowerBoundryW + flowDetector.flowHysteresisOffsetW)) {
+      //      faultIndication.Clear(FLOW_SENSOR_ERROR);
             prevResult = NO_ERROR;
             return NO_ERROR;
           }

@@ -50,25 +50,6 @@
 #include <stdio.h>
 #include "tmr1.h"
 
-#define DebounceDelay 500
-
-
-
-uint16_t Timer_1ms = 0;
-uint8_t flag_1msTimer = 0;
-
-uint16_t Timer_1ms2 = 0;
-uint8_t flag_1msTimer2 = 0;
-
-uint16_t Timer_1ms3 = 0;
-uint8_t flag_1msTimer3 = 0;
-
-uint16_t Timer_1ms4 = 0;
-uint8_t flag_1msTimer4 = 0;
-
-uint16_t Timer_1ms5 = 0;
-uint8_t flag_1msTimer5 = 0;
-
 /**
  Section: File specific functions
 */
@@ -142,26 +123,6 @@ void __attribute__ ( ( interrupt, no_auto_psv ) ) _T1Interrupt (  )
            TMR1_InterruptHandler(); 
     }
 
-       Timer_1ms ++;    
-    Timer_1ms2 ++;
-    Timer_1ms3 ++;
-    Timer_1ms4 ++;
-    
-    if(Timer_1ms > DebounceDelay)
-        flag_1msTimer = 1;
-    
-    if(Timer_1ms2 > DebounceDelay)
-        flag_1msTimer2 = 1;
-  
-    if(Timer_1ms3 > DebounceDelay)
-        flag_1msTimer3 = 1;
-    
-    if(Timer_1ms4 > DebounceDelay)
-        flag_1msTimer4 = 1;
-    
-    if(Timer_1ms5 > DebounceDelay)
-        flag_1msTimer5 = 1;
-    
     //***User Area End
 
     tmr1_obj.count++;

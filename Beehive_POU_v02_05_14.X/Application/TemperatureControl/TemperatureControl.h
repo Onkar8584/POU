@@ -58,16 +58,14 @@ IoTranslate requirements:
 // Enums for Relay control status
 typedef enum {
   RELAY_CONTROL_INITIAL = 0,
-  RELAY_CONTROL_CONTROL,//1
-  RELAY_CONTROL_SHUTDOWN,//2
-  RELAY_CONTROL_STBYCOOL,//3
-  RELAY_CONTROL_STBYHEAT,//4
-  RELAY_CONTROL_LOWFLOW,//5
-  RELAY_CONTROL_ERROR,//6
-  RELAY_CONTROL_ERROR_WAIT,//7
-  RELAY_CONTROL_DRY_FIRE_WAIT,//8
-  RELAY_CONTROL_TEMP_WAIT,//9
-  RELAY_CONTROL_ANTISCALE//10        
+  RELAY_CONTROL_CONTROL,
+  RELAY_CONTROL_SHUTDOWN,
+  RELAY_CONTROL_STBYCOOL,
+  RELAY_CONTROL_STBYHEAT,
+  RELAY_CONTROL_LOWFLOW,
+  RELAY_CONTROL_ERROR,
+  RELAY_CONTROL_ERROR_WAIT,
+  RELAY_CONTROL_DRY_FIRE_WAIT
 }RelayControlState_ETYP;
 
 typedef struct {
@@ -154,8 +152,6 @@ typedef struct {
 #define STANDBY_POWER_CYCLE         MAXPOWER_POWER_CYCLE    // Maximum
 #define POWER_CYCLE_OFF             0                       // OFF
 #define STANDBY_OFFSET              10                      // From set point
-
-#define INTIAL_WAIT_TIME             60                      // 30 seconds
 
 #define OVER_HEAT_TEMPERATURE       200                     // 200°F            // value changed as per Mike Jan Updates from 190F to 200F 
 

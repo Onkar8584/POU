@@ -90,17 +90,6 @@ static const Errors_ETYP thermShortErrors[] =
   THERMISTOR6_SHORT_ERROR,
 };
 
-#define DebounceIterations 7
-
- uint16_t debug_PowerADCLocalW = 0;
- uint16_t PowerADCLocalW = 0;
- 
-extern uint16_t Timer_1ms4;
-extern uint8_t flag_1msTimer4;
-
-uint8_t flag_once4 = 0, debounce_call4 = 0;
-
-uint8_t Flag_Error_Leak = 0;
 
 /*
 ================================================================================
@@ -227,12 +216,8 @@ Resources:
 
 static void checkVccError(void)
 {
-//  uint16_t PowerADCLocalW = 0;
+  uint16_t PowerADCLocalW = 0;
 
-//  debug_PowerADCLocalW = adcRead.adcDataARYW[VCC_VOLTAGE];
-  
-//  debug_PowerADCLocalW = PowerADCLocalW;
-  
   // Check power supply error
   PowerADCLocalW = POWER_SUPPLY_ADC_COUNT +                             \
           ((POWER_SUPPLY_ADC_COUNT * POWER_SUPPLY_TOLERANCE) / 100);
@@ -255,10 +240,10 @@ static void checkVccError(void)
 
       if ( PowerADCLocalW < POWER_SUPPLY_MIN_VOLTAGE) {
         // Declare power supply error
-        faultIndication.Error(DC_SUPPLY_ERROR);             //Set Error DC Supply
+        faultIndication.Error(DC_SUPPLY_ERROR);
       }
       else {
-        faultIndication.Clear(DC_SUPPLY_ERROR);             //Clear Error DC Supply
+        faultIndication.Clear(DC_SUPPLY_ERROR);
       }
     }
   }
@@ -466,8 +451,6 @@ bool ADCRead(void)
         // Read the register which have the digital data
         adcRead.adcDataARYW[adcRead.adcChannelIndex] = ADCREAD_READ_REGISTER();
 
-        debug_PowerADCLocalW = adcRead.adcDataARYW[VCC_VOLTAGE];
-        
         adcRead.adcDataARYW[adcRead.adcChannelIndex] =                            \
                 LowPassFilter(&adcRead.adcDataFilterARYW[adcRead.adcChannelIndex],\
                 adcRead.adcDataARYW[adcRead.adcChannelIndex]);
@@ -527,37 +510,7 @@ bool ADCRead(void)
               if ( (adcRead.adcDataARYW[MOISTURE_DETECTOR] < MOISTURE_DETECTOR_LEAK_COUNT) ||\
                       (adcRead.adcDataARYW[MOISTURE_DETECTOR] > MOISTURE_DETECTOR_UPPER_THRESHOLD)) {
                 // Declare leak detection error
-//                faultIndication.Error(LEAKAGE_ERROR);
-                  Flag_Error_Leak = 1;
-              }
-              
-              if(Flag_Error_Leak)
-              {
-//                  debounce_call3++;
-                  if(flag_once4)
-                  {
-                      flag_once4 = 1;
-                      Timer_1ms4 = 0;
-                      flag_1msTimer4 = 0;                      
-                  }
-                  if(flag_1msTimer4)
-                  {
-                    if ( (adcRead.adcDataARYW[MOISTURE_DETECTOR] < MOISTURE_DETECTOR_LEAK_COUNT) ||\
-                       (adcRead.adcDataARYW[MOISTURE_DETECTOR] > MOISTURE_DETECTOR_UPPER_THRESHOLD)) 
-                    {
-                        debounce_call4++;                        
-                    }
-                    else
-                    {
-                        debounce_call4 = 0; 
-                    }
-                  }
-                      
-              }
-              
-              if(debounce_call4 > DebounceIterations)
-              {
-                  faultIndication.Error(LEAKAGE_ERROR);
+                faultIndication.Error(LEAKAGE_ERROR);
               }
               break;
 

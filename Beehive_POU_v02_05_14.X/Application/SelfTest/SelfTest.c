@@ -31,7 +31,8 @@ Method Calling Requirements:
 
 Resources:
   This object will access the class B library provided by microchip.
-  And for IO test it access 6 feedback GPIOs
+ 
+
 
   // Enable the clock input to timer and start it
   #define ENABLE_TIMER_FOR_CLOCK_TEST()
@@ -320,6 +321,9 @@ bool ClassB_RunTimeTest(void)
       DISABLE_TIMER_AFTER_CLOCK_TEST();
     }
   }
+
+ 
+  
   return TASK_COMPLETED;
 }
 

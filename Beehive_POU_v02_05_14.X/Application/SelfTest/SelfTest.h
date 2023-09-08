@@ -31,15 +31,6 @@ Method Calling Requirements:
 
 Resources:
   This object will access the class B library provided by microchip.
-  And for IO test it access 6 feedback GPIOs
-
-IoTranslate requirements:
-  #define Relay1SupplyStatusDigIn_Read()// Relay 1 - 5V feedback GPIO read
-  #define Relay1GroundStatusDigIn_Read()// Relay 1 - Gnd feedback GPIO read
-  #define Relay2SupplyStatusDigIn_Read()// Relay 2 - 5V feedback GPIO read
-  #define Relay2GroundStatusDigIn_Read()// Relay 2 - Gnd feedback GPIO read
-  #define OptoCoupler1StatusDigIn_Read()// Opto Coupler 1 Status input GPIO read
-  #define OptoCoupler2StatusDigIn_Read()// Opto Coupler 2 Status input GPIO read
   // Enable the clock input to timer and start it
   #define ENABLE_TIMER_FOR_CLOCK_TEST()
   // Disable the clock input to timer and stop it
@@ -105,6 +96,7 @@ typedef struct{
 #define FLASH_TEST_INTERVAL             1    // * 500ms = 0.5 seconds
 #define EEPROM_TEST_INTERVAL            120  // * 500ms = 60 seconds
 #define CLOCK_TEST_INTERVAL             7200 // * 500ms = 3600 seconds
+
 
 #define RAM_RUN_TIME_TEST_SIZE          4    // No of bytes to be tested
 #define CODE_RUN_TIME_TEST_SIZE         16   // No of bytes to be tested
